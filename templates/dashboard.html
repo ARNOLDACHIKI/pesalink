@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Payment Validation Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Bulk Payment Account Validation Dashboard</h1>
+    {% if last_run_time %}
+    <p><strong>Last Validation Run:</strong> {{ last_run_time }} (runs every hour via scheduler)</p>
+    {% else %}
+    <p>No validation run has been completed yet.</p>
+    {% endif %}
+    <h2>Valid Accounts</h2>
+    <table class="results-table">
+        <tr>
+            <th>Account Number</th>
+            <th>Account Name</th>
+            <th>Balance</th>
+            <th>Account Type</th>
+            <th>Bank Code</th>
+            <th>Suspicious?</th>
+        </tr>
+        {% for acct in valid_accounts %}
+        <tr {% if acct.suspicious %}class="suspicious"{% endif %}>
+            <td>{{ acct.account_number }}</td>
+            <td>{{ acct.account_name }}</td>
+            <td>{{ acct.balance }}</td>
+            <td>{{ acct.account_type }}</td>
+            <td>{{ acct.bank_code }}</td>
+            <td>{{ "Yes" if acct.suspicious else "No" }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <h2>Invalid Accounts</h2>
+    <table class="results-table">
+        <tr>
+            <th>Account Number</th>
+            <th>Account Name</th>
+            <th>Bank Code</th>
+            <th>Reason Code</th>
+        </tr>
+        {% for acct in invalid_accounts %}
+        <tr>
+            <td>{{ acct.account_number }}</td>
+            <td>{{ acct.account_name }}</td>
+            <td>{{ acct.bank_code }}</td>
+            <td>{{ acct.reason }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <h3>Upload New Account File</h3>
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".csv" required>
+        <button type="submit">Upload and Validate</button>
+    </form>
+</body>
+</html>
